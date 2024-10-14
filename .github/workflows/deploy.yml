@@ -3,28 +3,41 @@ name: Deploy to S3
 on:
   push:
     branches:
-      - main  # You can change this to the branch you want to trigger the action.
+      - main  # The workflow will trigger on push to the main branch
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build-deploy:
+    runs-on: ubuntu-latest  # The workflow runs on a GitHub-hosted runner with an Ubuntu image
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Step 1: Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2  # Action to check out the repository's code into the runner
 
-    # Optional: Install AWS CLI (if it's not already installed)
-    - name: Install AWS CLI
-      run: sudo apt-get install -y awscli
+      # Optional: Install AWS CLI (if it's not already installed) 
+      - name: Install AWS CLI
+        run: sudo apt-get install -y awscli
 
-    # Configure AWS credentials from GitHub Secrets
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-west-2  # Specify your region
+      # Step 2: Install Node.js
+      - name: Install Node.js
+        uses: actions/setup-node@v2  # Setup Node.js in the GitHub runner
+        with:
+          node-version: '14'  # Node.js version 14 is being used here. Modify as per your project's requirement.
 
-    # Sync files to S3
-    - name: Deploy to S3
-      run: aws s3 sync ./public s3://your-s3-bucket-name --delete
+      # Step 3: Install project dependencies using npm
+      - name: Install dependencies
+        run: npm install  # This command will install all the dependencies specified in package.json
+
+      # Step 4: Build the project
+      - name: Build the project
+        run: npm run build  # This command runs the build script in your project, typically outputting to a 'build/' directory
+
+      # Step 5: Deploy the built files to AWS S3
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key ID from GitHub Secrets
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # AWS secret access key from GitHub Secrets
+          AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS region stored in GitHub Secrets (e.g., 'us-east-1')
+          S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 bucket name stored in GitHub Secrets
+        run: |
+          aws s3 sync build/ s3://$S3_BUCKET --delete  # Sync the 'build/' folder to the S3 bucket
