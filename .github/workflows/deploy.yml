@@ -35,10 +35,10 @@ jobs:
       # Step 5: Modify paths in index.html for AWS
       - name: Modify paths for AWS deployment
         run: |
-          sed -i 's|/box-office/logo192.png|/logo192.png|g' ./build/index.html
-          sed -i 's|/box-office/manifest.json|/manifest.json|g' ./build/index.html
-          sed -i 's|/box-office/static/js/main.[a-z0-9]*.js|/static/js/main.9d9e34d0.js|g' ./build/index.html
-          sed -i 's|/box-office/static/css/main.[a-z0-9]*.css|/static/css/main.b2586571.css|g' ./build/index.html
+          sed -i 's|/box-office/logo192.png|logo192.png|g' ./build/index.html
+          sed -i 's|/box-office/manifest.json|manifest.json|g' ./build/index.html
+          sed -i 's|/box-office/static/js/main.[a-z0-9]*.js|static/js/main.9d9e34d0.js|g' ./build/index.html
+          sed -i 's|/box-office/static/css/main.[a-z0-9]*.css|static/css/main.b2586571.css|g' ./build/index.html
 
       # Step 6: Deploy the built files to AWS S3
       - name: Deploy to S3
@@ -48,4 +48,5 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS region stored in GitHub Secrets (e.g., 'us-east-1')
           S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 bucket name stored in GitHub Secrets
         run: |
-          aws s3 sync build/ s3://$S3_BUCKET --delete  # Sync the 'build/' folder to the S3 bucket
+          aws s3 sync build/ s3://$S3_BUCKET --delete --cache-control "max-age=31536000" --acl public-read
+          aws s3 cp s3://$S3_BUCKET/index.html s3://$S3_BUCKET/index.html --cache-control "no-cache" --content-type "text/html" --metadata-directive REPLACE
