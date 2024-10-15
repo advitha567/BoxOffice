@@ -37,8 +37,8 @@ jobs:
         run: |
           sed -i 's|/box-office/logo192.png|logo192.png|g' ./build/index.html
           sed -i 's|/box-office/manifest.json|manifest.json|g' ./build/index.html
-          sed -i 's|/box-office/static/js/main.[a-z0-9]*.js|static/js/main.9d9e34d0.js|g' ./build/index.html
-          sed -i 's|/box-office/static/css/main.[a-z0-9]*.css|static/css/main.b2586571.css|g' ./build/index.html
+          sed -i 's|/box-office/static/js/main.[a-z0-9]*.js|static/js/main.[a-z0-9]*.js|g' ./build/index.html
+          sed -i 's|/box-office/static/css/main.[a-z0-9]*.css|static/css/main.[a-z0-9]*.css|g' ./build/index.html
 
       # Step 6: Deploy the built files to AWS S3
       - name: Deploy to S3
