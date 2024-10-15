@@ -12,35 +12,23 @@ jobs:
     steps:
       # Step 1: Checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v2  # Action to check out the repository's code into the runner
-
-      # Optional: Install AWS CLI (if it's not already installed) 
-      - name: Install AWS CLI
-        run: sudo apt-get install -y awscli
+        uses: actions/checkout@v2
 
       # Step 2: Install Node.js
       - name: Install Node.js
-        uses: actions/setup-node@v2  # Setup Node.js in the GitHub runner
+        uses: actions/setup-node@v2
         with:
-          node-version: '14'  # Node.js version 14 is being used here. Modify as per your project's requirement.
+          node-version: '14'  # Node.js version used in your project
 
       # Step 3: Install project dependencies using npm
       - name: Install dependencies
-        run: npm install  # This command will install all the dependencies specified in package.json
+        run: npm install
 
       # Step 4: Build the project
       - name: Build the project
-        run: npm run build  # This command runs the build script in your project, typically outputting to a 'build/' directory
+        run: npm run build  # Generates hashed filenames and updates index.html
 
-      # Step 5: Modify paths in index.html for AWS
-      - name: Modify paths for AWS deployment
-        run: |
-          sed -i 's|/box-office/logo192.png|logo192.png|g' ./build/index.html
-          sed -i 's|/box-office/manifest.json|manifest.json|g' ./build/index.html
-          sed -i 's|/box-office/static/js/main.[a-z0-9]*.js|static/js/main.[a-z0-9]*.js|g' ./build/index.html
-          sed -i 's|/box-office/static/css/main.[a-z0-9]*.css|static/css/main.[a-z0-9]*.css|g' ./build/index.html
-
-      # Step 6: Deploy the built files to AWS S3
+      # Step 5: Deploy the built files to AWS S3
       - name: Deploy to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}  # AWS access key ID from GitHub Secrets
