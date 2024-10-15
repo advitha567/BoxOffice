@@ -48,5 +48,5 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}  # AWS region stored in GitHub Secrets (e.g., 'us-east-1')
           S3_BUCKET: ${{ secrets.S3_BUCKET_NAME }}  # S3 bucket name stored in GitHub Secrets
         run: |
-          aws s3 sync build/ s3://$S3_BUCKET --delete --cache-control "max-age=31536000" --acl public-read
+          aws s3 sync build/ s3://$S3_BUCKET --delete --cache-control "max-age=31536000"
           aws s3 cp s3://$S3_BUCKET/index.html s3://$S3_BUCKET/index.html --cache-control "no-cache" --content-type "text/html" --metadata-directive REPLACE
